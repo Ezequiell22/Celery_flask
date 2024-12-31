@@ -1,11 +1,23 @@
 from celery import Celery
 import sqlite3
+from celery.schedules import crontab
 
 app = Celery(
   main = 'worker_tasks',
   broker='pyamqp//:guest@localhost//',
   backend='db+sqlite:///celery.sqlite'
 )
+
+#agendamento
+app.conf.beat_schedule = {
+  'sc-stock-every-minute' : {
+    'task' : 'task_x',
+    'schedule' : crontab(minute='*'),
+    'args' : ('teste 1', )
+  }
+}
+
+app.conf.timezone = 'America/Sao_Paulo'
 
 @app.task
 def task_x(name):
